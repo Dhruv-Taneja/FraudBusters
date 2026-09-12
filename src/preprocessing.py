@@ -1,6 +1,35 @@
 import cv2
 import numpy as np
 
+# In preprocessing.py: Add this function
+
+def check_image_quality(image, blur_threshold=100.0):
+    """
+    Evaluates image quality (blur and exposure).
+    Returns:
+        is_valid (bool): Whether the image is good enough for processing.
+        reason (str): Reason for failure if any.
+        blur_score (float): Laplacian variance.
+    """
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # Measure edge variance (blur detection)
+    blur_score = cv2.Laplacian(gray, cv2.CV_64F).var()
+    
+    # Measure mean brightness
+    mean_brightness = np.mean(gray)
+    
+    if blur_score < blur_threshold:
+        return False, f"Image is too blurry (Sharpness Score: {blur_score:.2f})", blur_score
+        
+    if mean_brightness < 35:
+        return False, f"Image is underexposed/too dark (Brightness: {mean_brightness:.1f})", blur_score
+        
+    if mean_brightness > 235:
+        return False, f"Image is overexposed/glared (Brightness: {mean_brightness:.1f})", blur_score
+
+    return True, "Quality passed", blur_score
+
 def deskew_and_crop(image):
     """
     Deskew and crop the document using OpenCV.
