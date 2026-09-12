@@ -1,0 +1,8 @@
+opencv-python
+numpy
+Pillow
+deepface
+tf-keras
+xgboost
+scikit-image
+scikit-learn
